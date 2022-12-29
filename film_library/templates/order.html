@@ -1,0 +1,156 @@
+{% extends 'home.html' %}
+
+
+{% block content %}
+<style>
+.search-sec{
+    padding: 2rem;
+}
+.search-slt{
+    display: block;
+    width: 100%;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    height: calc(3rem + 2px) !important;
+    border-radius:0;
+}
+.wrn-btn{
+    width: 100%;
+    font-size: 16px;
+    font-weight: 400;
+    text-transform: capitalize;
+    height: calc(3rem + 2px) !important;
+    border-radius:0;
+}
+</style>
+
+    <div class="container">
+        <div class="d-flex flex-column">
+            <h1>
+
+                <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css"></script>
+
+                <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+
+
+            </h1>
+            <section class="search-sec">
+                    <div class="container">
+
+                        <form method="GET" action="{{ url_for('filter_films') }}">
+
+                            <div class="row">
+                                <div class="col-lg-15">
+                                    <div class="row">
+                                        <div class="col-lg-2 col-md-3 col-sm-12 p-0">
+                                            <input type="text" class="form-control search-slt" placeholder="Filter by film genre" name="genre">
+                                        </div>
+                                        <div class="col-lg-2 col-md-3 col-sm-12 p-0">
+                                            <input type="text" onfocus="(this.type='Date')" class="form-control search-slt" placeholder="Release date from" name="release_date_from">
+                                        </div>
+
+                                        <div class="col-lg-2 col-md-3 col-sm-12 p-0">
+                                            <input type="text" onfocus="(this.type='Date')" class="form-control search-slt" placeholder="Release date to" name="release_date_to">
+                                        </div>
+                                        <div class="col-lg-2 col-md-3 col-sm-12 p-0">
+                                            <input type="text" class="form-control search-slt" placeholder="Filter by director" name="director">
+                                        </div>
+
+                                        <div class="col-lg-2 col-md-3 col-sm-12 p-0">
+                                            <button type="submit" class="btn-danger form-control wrn-btn">Filter</button>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+                </section>
+
+                <form method="GET" action="{{ url_for('order_films') }}">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="rating" id="flexCheckDefault" name="rating">
+                  <label class="form-check-label" for="flexCheckDefault">
+                    Order by rating
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="release" id="flexCheckChecked" name="release">
+                  <label class="form-check-label" for="flexCheckChecked">
+                    Order by release
+                  </label>
+                </div>
+                <div class="form-check">
+                     <button type="submit" >Apply</button>
+
+                </div>
+                </form>
+
+            <hr>
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div style="color: red" class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+		{% endwith %}
+        <table class="table">
+          <thead class="thead-dark">
+            <tr>
+              <th scope="col">Poster</th>
+<!--              <th scope="col">id</th>-->
+              <th scope="col">Name</th>
+              <th scope="col">Description</th>
+              <th scope="col">Rating</th>
+            </tr>
+          </thead>
+            {% for film in films.items %}
+              <tbody>
+                <tr>
+                  <td>
+                      <div class="media-body">
+                         <img class="account-img" src="{{ url_for('static', filename='poster_pics/' + film.poster) }}">
+                      </div>
+                  </td>
+<!--                  <td>{{film.id}}</td>-->
+                  <td><a href="{{ url_for('get_film', film_id=film.id )}}">{{film.name}}</a></td>
+                  <td>{{film.description}}</td>
+                  <td>{{film.rating}}</td>
+
+                </tr>
+              </tbody>
+            {% endfor %}
+
+            </table>
+
+            <nav aria-label="Page navigation example">
+              <ul class="pagination justify-content-center">
+                {% for page_num in films.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                  {% if page_num %}
+                    {% if films.page == page_num %}
+                        <li style="display: inline-block;" class="page-item active"><a class="page-link" href="{{ url_for('order_films', page=page_num, rating=rating_parm, release=release_parm) }}?{{ request.query_string.decode() }}">{{ page_num }}</a></li>
+                    {% else %}
+                        <li style="display: inline-block;" class="page-item"><a class="page-link" href="{{ url_for('order_films', page=page_num, rating=rating_parm, release=release_parm) }}?{{ request.query_string.decode() }}">{{ page_num }}</a></li>
+                    {% endif %}
+                  {% else %}
+                  ...
+                  {% endif %}
+
+            {% endfor %}
+              </ul>
+            </nav>
+
+
+        </div>
+    </div>
+
+{% endblock content%}
